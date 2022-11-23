@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial;
+        color: #010211;
+        font-size: 125%;
+      }
+      .advisor {
+        width: 58%;
+        height: 300px;
+        background: #f8f8ff;
+        float: left;
+        padding: 1%;
+      }
+
+      .appointment {
+        width: 38%;
+        height: 300px;
+        background: #dcdcdc;
+        float: right;
+        padding: 1%;
+      }
+
+      input[type="button"] {
+        background-color: rgb(85, 85, 219);
+        border: none;
+        color: white;
+        padding: 12px 32px;
+        text-align: center;
+        display: inline-block;
+        font-size: 12px;
+        margin: 3px 2px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Appointment Booking</h1>
+    <hr />
+
+    <div class="advisor">
+      <!-- Counsellor informaiton -->
+      <div style="float: left; width: 48%;">
+        <h2>Workplace Advisors</h2>
+        <div id="advisorInfo">Advisor info here</div>
+        <br />
+
+        <input type="button" value="Next" onclick="nextAdvisor();" />
+      </div>
+
+      <!-- Appointments available -->
+      <div style="float: right; width: 48%;">
+        <h2>Availability (24 hour time):</h2>
+        <div id="advisorTimes">Appointments here</div>
+        <br />
+      </div>
+    </div>
+    <div class="appointment">
+      <h2>Booked Appointments:</h2>
+      <div id="apptOutput">Appointment info here</div>
+      <br />
+      <input type="button" value="Next" onclick="nextAppoint();" />
+    </div>
+
+    <!-- Booking form -->
+    <div>
+      <h2>Book an Appointment</h2>
+      Student Name: <input id="aptName" type="text" /><br /><br />
+      Appointment Time 24 hours (Enter time between 9 and 17):
+      <input id="aptTime" type="number" /><br /><br />
+      Type: <input id="aptService" type="text" /><br /><br />
+      <input type="button" value="Book" onclick="makeAppointment();" />
+    </div>
+
+    <!-- Javascript here -->
+    <script>
+      // build the constructors
+
+      // advisor() constructor, holds information about the academic advisors
+      function advisor(firstName, lastName, availableTimes, servicesOffered) {
+        this.firstName = firstName; // advisor's first name
+        this.lastName = lastName; // advisor's last name
+        this.availableTimes = availableTimes; // array including times they're available for appointments
+        this.servicesOffered = servicesOffered; // array including services the advisor offers
+      }
+
+      // appointment() constructor, holds information about booked appointments
+      function appointment(
+        advisorName,
+        studentName,
+        appointmentTime,
+        serviceSelected
+      ) {
+        this.advisorName = advisorName; // advisor's first name
+        this.studentName = studentName; // student's first name
+        this.appointmentTime = appointmentTime; // time of the appointment
+        this.serviceSelected = serviceSelected; // selected service
+      }
+
+      // create empty arrays to hold future constructed advisors and appointments
+      var advisors = [];
+      var appointments = [];
+
+      // create counter variables to index advisors and appointments arrays
+      var advisorCount = 0;
+      var appointmentCount = 0;
+
+      // create advisor objects using constructors
+      var firstAdvisor = new advisor(
+        "Michael",
+        "Scott",
+        ["10", "11", "13", "17"],
+        ["meetings", "management"]
+      );
+      var secondAdvisor = new advisor(
+        "Dwight",
+        "Schrute",
+        ["9", "10", "11", "12"],
+        ["time management", "safety"]
+      );
+      var thirdAdvisor = new advisor(
+        "Jim",
+        "Halpert",
+        ["14", "15", "16", "17"],
+        ["sales", "teamwork"]
+      );
+
+      // push new advisor objects to advisors array
+      advisors.push(firstAdvisor, secondAdvisor, thirdAdvisor);
+
+      // displayAdvisor(advisor) function, displays advisor in "Workplace Advisors" section when triggered
+      function displayAdvisor(advisor) {
+        // display information from advisor parameter in corresponding element
+        document.getElementById("advisorInfo").innerHTML =
+          "First Name: " +
+          advisor.firstName +
+          "<br>Last Name: " +
+          advisor.lastName +
+          "<br>Services: " +
+          advisor.servicesOffered.join(", ");
+        // call function to display advisor availability
+        displayAvailability(advisor);
+      }
+
+      // call function for when website loads it displays the first advisor
+      displayAdvisor(firstAdvisor);
+
+      // displayAvailability(advisor) function, displays the availability times for advisor in the corresponding element
+      function displayAvailability(advisor) {
+        // display information from advisor parameter in corresponding element
+        document.getElementById(
+          "advisorTimes"
+        ).innerHTML = advisor.availableTimes.join("<br>");
+      }
+
+      // displayAppointment(appointment) function, displays appointments once made
+      function displayAppointment(appointment) {
+        if (appointments.length > 0) {
+          document.getElementById("apptOutput").innerHTML =
+            "Advisor Name: " +
+            appointment.advisorName +
+            "<br>Student Name: " +
+            appointment.studentName +
+            "<br>Appointment Time: " +
+            appointment.appointmentTime +
+            "<br>Service: " +
+            appointment.serviceSelected;
+        } else {
+          document.getElementById("apptOutput").innerHTML =
+            "Appointment info here";
+        }
+      }
+
+      // makeAppointment() function, triggers when user clicks on "Book", stores selected appointment
+      function makeAppointment() {
+        //retrieve textbox entries
+        var nameInput = document.getElementById("aptName").value;
+        var timeInput = document.getElementById("aptTime").value;
+        var serviceInput = document.getElementById("aptService").value;
+
+        // retrieve currently selected advisor
+        var selectedAdvisor = advisors[advisorCount];
+
+        // retrieve index of selected time and service (if exists, if not it will be -1)
+        var timeIndex = selectedAdvisor.availableTimes.indexOf(timeInput);
+        var serviceIndex = selectedAdvisor.servicesOffered.indexOf(
+          serviceInput
+        );
+
+        // check if user is requesting valid appointment
+        if (timeIndex >= 0 && serviceIndex >= 0) {
+          // inform user input is valid
+          alert(
+            "You have successfully created an appointment with advisor " +
+              selectedAdvisor.firstName +
+              " for " +
+              serviceInput +
+              " advisory at time " +
+              timeInput +
+              " hours"
+          );
+          // create new appointment object and push it to the appointments array
+          var newAppointment = new appointment(
+            selectedAdvisor.firstName,
+            nameInput,
+            timeInput,
+            serviceInput
+          );
+          appointments.push(newAppointment);
+          // display appointment if this is the first appointment
+          if (appointments.length === 1) {
+            displayAppointment(newAppointment);
+          }
+          // remove time from advisor's availability and refresh displayed availability
+          advisors[advisorCount].availableTimes.splice(timeIndex, 1);
+          displayAvailability(advisors[advisorCount]);
+          // clear the input fields
+          document.getElementById("aptName").value = "";
+          document.getElementById("aptTime").value = "";
+          document.getElementById("aptService").value = "";
+        } else {
+          // if input is invalid, inform user
+          alert("This appointment is invalid, please try again.");
+        }
+      }
+
+      // nextAdvisor() function, allows user to scroll through advisors
+      function nextAdvisor() {
+        // set counter based upon which advisor is currently selected in index (reset to 0 if viewing last advisor)
+        if (advisorCount < 2) {
+          advisorCount++;
+        } else {
+          advisorCount = 0;
+        }
+        // display the new advisor
+        displayAdvisor(advisors[advisorCount]);
+      }
+
+      // nextAppoint() function, allows user to scroll through current appointments
+      function nextAppoint() {
+        // set next advisor based on current index (reset to index 0 if needed)
+        if (appointmentCount < appointments.length - 1) {
+          appointmentCount++;
+        } else {
+          appointmentCount = 0;
+        }
+        // display new appointment
+        displayAppointment(appointments[appointmentCount]);
+      }
+    </script>
+  </body>
+</html>
